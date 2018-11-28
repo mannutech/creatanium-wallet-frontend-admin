@@ -34,10 +34,11 @@ class UserLookup extends Component {
         tableItems: [],
         tableItems1: [],
         loading: false,
-        toggleWalletCard: true
+        toggleWalletCard: true,
+        userid: Cookies.get('userid')
     }
 
-    componentDidMount(){
+    componentDidMount() {
         axios.defaults.headers['x-session-id'] = Cookies.get('session-id')
     }
 
@@ -98,14 +99,21 @@ class UserLookup extends Component {
         }
     }
 
+    async refreshBal(coinid, address,user_id) {
+        await this.setState({ loading: true })
+        await axios.get(`${API_URL}/admin/refreshbalance?coin_id=${coinid}&address=${address}`)
+        await this.oncl(user_id)
+        await this.setState({ loading: false })
+    }
+
     async oncl(a) {
         let tableItems1 = []
         try {
             await this.setState({ toggleWalletCard: false })
             await this.setState({ loading: true })
-        
+
             let { data } = await axios.get(`${API_URL}/admin/walletlookup?userid=${a}`)
-            await data.map(function (item, i) {
+            await data.map((item, i) => {
                 tableItems1.push({
                     key: i,
                     item: [
@@ -121,7 +129,21 @@ class UserLookup extends Component {
                         { content: item.address },
                         { content: item.converted_amt_locked },
                         { content: item.converted_amt_spend },
-                        { content: item.converted_amt_tot }
+                        { content: item.converted_amt_tot },
+                        {
+                            content: (
+                                <React.Fragment>
+                                    <Button
+                                        color="secondary"
+                                        size="sm"
+                                        icon="refresh-cw"
+                                        onClick={() => { this.refreshBal(item.coin_id, item.address,item.user_id) }}
+                                    >
+                                        Refresh Balance
+                                    </Button>
+                                </React.Fragment>
+                            ),
+                        },
                     ]
                 })
             })
@@ -202,9 +224,10 @@ class UserLookup extends Component {
                                                     { content: "Coin" },
                                                     { content: "Symbol" },
                                                     { content: "Address" },
-                                                    { content: "Locked Balance" },
-                                                    { content: "Unlocked Balance" },
-                                                    { content: "Total Balance" },
+                                                    { content: "Locked Bal" },
+                                                    { content: "Unlocked Bal" },
+                                                    { content: "Total Bal" },
+                                                    { content: null }
                                                 ]}
                                                 bodyItems={this.state.tableItems1}
                                             />

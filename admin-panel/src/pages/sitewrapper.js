@@ -39,6 +39,7 @@ class SiteWrapper extends Component {
         await Cookies.remove('session-id')
         await Cookies.remove('name')
         await Cookies.remove('email')
+        await Cookies.remove('userid')
         this.setState({logout : true})
     }
 
