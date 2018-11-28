@@ -69,7 +69,7 @@ class Transactions extends Component {
                         {
                             content: (
                                 <React.Fragment>
-                                    <span className={item.status == 'Completed' ? "status-icon bg-success" : "status-icon bg-warning"} /> {item.status}
+                                    <span className={item.status == 'Completed' ? "status-icon bg-success" : "status-icon bg-danger"} /> {item.status}
                                 </React.Fragment>
                             ),
                         },
@@ -146,8 +146,8 @@ class Transactions extends Component {
                                     <Form.Group label="Transaction Type">
                                         <Form.Select value={this.state.trxtype} onChange={(e) => { this.onttc(e.target.value) }}>
                                             <option value="all">All</option>
-                                            <option value="30">Credit</option>
-                                            <option value="40">Debit</option>
+                                            <option value="40">Credit</option>
+                                            <option value="30">Debit</option>
                                         </Form.Select>
                                     </Form.Group>
                                 </Grid.Col>
