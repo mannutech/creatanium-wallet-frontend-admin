@@ -34,11 +34,22 @@ class Transactions extends Component {
         loading: false,
         userid: '',
         sort: 'desc',
-        trxtype: 'all'
+        trxtype: 'all',
+        ref : React.createRef()
     }
 
     componentDidMount(){
         axios.defaults.headers['x-session-id'] = Cookies.get('session-id')
+    }
+
+    exportCSV = () => {
+        axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=all&export=true`).then(response => {
+            let blob = new Blob([response.data], {type: 'application/octet-stream'})
+            let ref = this.state.ref
+            ref.current.href = URL.createObjectURL(blob)
+            ref.current.download = 'ledger.csv'
+            ref.current.click()
+        })
     }
 
     async onty(v) {
@@ -155,7 +166,8 @@ class Transactions extends Component {
                                     <Card.Header>
                                         <Card.Title>Transactions</Card.Title>
                                         <Card.Options>
-                                            <Button color="primary" size="sm" onClick={() => window.open(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=all&export=true`, "_blank")}>
+                                        <a style={{display: 'none'}} href='empty' ref={this.state.ref}>ref</a>
+                                            <Button color="primary" size="sm" onClick={() => this.exportCSV()}>
                                                 Export Ledger To CSV
                                         </Button>
                                         </Card.Options>
