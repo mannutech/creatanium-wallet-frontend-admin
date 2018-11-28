@@ -155,7 +155,7 @@ class Transactions extends Component {
                                     <Card.Header>
                                         <Card.Title>Transactions</Card.Title>
                                         <Card.Options>
-                                            <Button color="primary" size="sm" onClick={() => window.open("http://localhost:3000/admin/transactionlookup?user_id=bad3909f-0f37-4147-bfb8-c69b2a474319&rangestart=0&rangeend=1937526914630&trxtype=all&amountlimit=0&limit=100&sort=desc&symb=all&export=true", "_blank")}>
+                                            <Button color="primary" size="sm" onClick={() => window.open(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=all&export=true`, "_blank")}>
                                                 Export Ledger To CSV
                                         </Button>
                                         </Card.Options>
