@@ -26,10 +26,8 @@ import {
 
 import SiteWrapper from './sitewrapper'
 
-
-axios.defaults.headers['x-session-id'] = 'aa5aecff-e055-404e-9af3-ecc7206731c0'
-
-
+import Cookies from 'js-cookie'
+import { API_URL } from '../constants.js'
 class Transactions extends Component {
     state = {
         tableItems: [],
@@ -39,12 +37,16 @@ class Transactions extends Component {
         trxtype: 'all'
     }
 
+    componentDidMount(){
+        axios.defaults.headers['x-session-id'] = Cookies.get('session-id')
+    }
+
     async onty(v) {
         let tableItems = []
         await this.setState({ userid: v })
         try {
             await this.setState({ loading: true })
-            let { data } = await axios.get(`http://localhost:3000/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=all&export=false`)
+            let { data } = await axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=all&export=false`)
             await data.data.map(function (item, i) {
                 tableItems.push({
                     key: i,

@@ -3,7 +3,7 @@ import "tabler-react/dist/Tabler.css";
 import { LoginPage, Page, Form, FormCard, Button, Card, Dimmer } from "tabler-react";
 import axios from 'axios'
 import Cookies from 'js-cookie'
-
+import { API_URL } from '../constants.js'
 class Login extends Component {
     state = {
         username: '',
@@ -12,14 +12,19 @@ class Login extends Component {
         error: false,
         errormsg: 'Error encountered'
     }
+
     async handleLogin() {
         try {
-            this.setState({ loading: true })
-            let { data } = await axios.get(`http://localhost:3000/admin/login?username=${this.state.username}&password=${this.state.password}`)
-            console.log(data.data)
-            this.setState({ loading: false, error: false, errormsg: '' })
+            await this.setState({ loading: true })
+            let { data } = await axios.get(`${API_URL}/admin/login?username=${this.state.username}&password=${this.state.password}`)
+            //console.log(data.data)
+            await Cookies.set('session-id',data.data.sessionid)
+            await Cookies.set('name',data.data.firstname + ' ' + data.data.lastname)
+            await Cookies.set('email',data.data.email)
+            await this.setState({ loading: false, error: false, errormsg: '' })
+            this.props.history.push('/')
         } catch (e) {
-            this.setState({ loading: false, error: true, errormsg: 'Cannot login' })
+            await this.setState({ loading: false, error: true, errormsg: 'Cannot login' })
         }
     }
     render() {

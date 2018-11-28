@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { NavLink, withRouter } from "react-router-dom";
+import { NavLink, withRouter, Redirect, Link, LinkProps } from "react-router-dom";
 
 import "tabler-react/dist/Tabler.css";
 import {
@@ -10,27 +10,20 @@ import {
     Button,
     RouterContextProvider,
 } from "tabler-react";
+import Cookies from 'js-cookie'
 
 const notificationsObjects = [
     {
         message: (
-        <React.Fragment>
-            This is <strong>alpha</strong> version of creatanium wallet administrator panel.
+            <React.Fragment>
+                This is <strong>alpha</strong> version of creatanium wallet administrator panel.
         </React.Fragment>
         ),
         time: "1 minutes ago",
     }
 ];
 
-const accountDropdownProps = {
-    avatarURL: "https://www.fakepersongenerator.com/Face/female/female20161025322365265.jpg",
-    name: "Jane Pearson",
-    description: "Administrator",
-    options: [
-        { icon: "help-circle", value: "Need help?" },
-        { icon: "log-out", value: "Sign out" },
-    ],
-};
+
 
 const navBarItems = [
     { value: "User Lookup", to: "/user-lookup", icon: "search", LinkComponent: withRouter(NavLink) },
@@ -38,7 +31,23 @@ const navBarItems = [
 ]
 
 class SiteWrapper extends Component {
+
+    state = { logout: false }
+
+    async handleLogout() {
+        await Cookies.remove('session-id')
+        await Cookies.remove('name')
+        await Cookies.remove('email')
+        this.setState({logout : true})
+    }
+
     render() {
+        if (this.state.logout)
+            return (<Redirect to={{
+                pathname: '/',
+                state: { }
+            }} />)
+
         return (
             <Site.Wrapper
                 headerProps={{
@@ -46,7 +55,15 @@ class SiteWrapper extends Component {
                     alt: "Tabler React",
                     imageURL: "images/creatanium-logo.png",
                     notificationsTray: { notificationsObjects },
-                    accountDropdown: accountDropdownProps
+                    accountDropdown: {
+                        avatarURL: "https://img.icons8.com/dusk/288/cat-profile.png",
+                        name: Cookies.get('name'),
+                        description: "Administrator",
+                        options: [
+                            { icon: "help-circle", value: "Need help?" },
+                            { icon: "log-out", value: "Sign out", onClick: () => { this.handleLogout() } },
+                        ],
+                    }
                 }}
                 navProps={{ itemsObjects: navBarItems }}
                 routerContextComponentType={withRouter(RouterContextProvider)}

@@ -25,8 +25,9 @@ import {
 
 import SiteWrapper from './sitewrapper'
 
+import Cookies from 'js-cookie'
+import { API_URL } from '../constants.js'
 
-axios.defaults.headers['x-session-id'] = 'aa5aecff-e055-404e-9af3-ecc7206731c0'
 
 class UserLookup extends Component {
     state = {
@@ -36,11 +37,15 @@ class UserLookup extends Component {
         toggleWalletCard: true
     }
 
+    componentDidMount(){
+        axios.defaults.headers['x-session-id'] = Cookies.get('session-id')
+    }
+
     async onty(a) {
         let tableItems = []
         try {
             this.setState({ loading: true })
-            let { data } = await axios.get(`http://localhost:3000/admin/userlookup?keyword=${a.target.value}`)
+            let { data } = await axios.get(`${API_URL}/admin/userlookup?keyword=${a.target.value}`)
             await data.map((item, i) => {
                 tableItems.push({
                     key: i,
@@ -99,7 +104,7 @@ class UserLookup extends Component {
             await this.setState({ toggleWalletCard: false })
             await this.setState({ loading: true })
         
-            let { data } = await axios.get(`http://localhost:3000/admin/walletlookup?userid=${a}`)
+            let { data } = await axios.get(`${API_URL}/admin/walletlookup?userid=${a}`)
             await data.map(function (item, i) {
                 tableItems1.push({
                     key: i,
