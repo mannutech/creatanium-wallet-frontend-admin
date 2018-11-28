@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { NavLink, withRouter, Redirect, Link, LinkProps } from "react-router-dom";
 
-import "tabler-react/dist/Tabler.css";
+
 import {
     Site,
     Nav,
@@ -10,6 +10,7 @@ import {
     Button,
     RouterContextProvider,
 } from "tabler-react";
+import "../tabler-dist/Tabler.css";
 import Cookies from 'js-cookie'
 
 const notificationsObjects = [
