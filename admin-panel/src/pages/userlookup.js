@@ -167,7 +167,7 @@ class UserLookup extends Component {
                         <Grid.Row>
                             <Grid.Col width={12}>
                                 <Alert type="primary" isDismissible>
-                                    <strong>You can use </strong> email, first name, last name, user id, mobile no, address to lookup.
+                                    <strong>You can use </strong> email, first name, last name, user id, mobile no, address line to lookup.
                             </Alert>
 
                                 <Form.Input
