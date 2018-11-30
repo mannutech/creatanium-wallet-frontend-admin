@@ -28,6 +28,10 @@ import SiteWrapper from './sitewrapper'
 
 import Cookies from 'js-cookie'
 import { API_URL } from '../constants.js'
+
+import DatePicker from "react-datepicker";
+import "../react-datepicker-dist/react-datepicker.css";
+
 class Transactions extends Component {
     state = {
         tableItems: [],
@@ -35,16 +39,15 @@ class Transactions extends Component {
         userid: '',
         sort: 'desc',
         trxtype: 'all',
-        ref : React.createRef()
-    }
-
-    componentDidMount(){
-        axios.defaults.headers['x-session-id'] = Cookies.get('session-id')
+        ref: React.createRef(),
+        startDate: new Date(),
+        datePickerOpen: false,
+        vest_txhash: null
     }
 
     exportCSV = () => {
         axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=all&export=true`).then(response => {
-            let blob = new Blob([response.data], {type: 'application/octet-stream'})
+            let blob = new Blob([response.data], { type: 'application/octet-stream' })
             let ref = this.state.ref
             ref.current.href = URL.createObjectURL(blob)
             ref.current.download = 'ledger.csv'
@@ -58,7 +61,7 @@ class Transactions extends Component {
         try {
             await this.setState({ loading: true })
             let { data } = await axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=all&export=false`)
-            await data.data.map(function (item, i) {
+            await data.data.map((item, i) => {
                 tableItems.push({
                     key: i,
                     item: [
@@ -93,7 +96,31 @@ class Transactions extends Component {
                                 </React.Fragment>
                             ),
                         },
-                        { content: item.tx_hash }
+                        { content: item.vesting_end_ts == 0 ? 'N/A' : moment(item.vesting_end_ts).utc().format('DD-MMM-YYYY Z') },
+                        {
+                            content: (
+                                <React.Fragment>
+                                    <div style={{ maxWidth: 300, whiteSpace: 'normal', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                                        {item.tx_hash}
+                                    </div>
+                                </React.Fragment>
+                            )
+                        },
+                        {
+                            content: (
+                                <React.Fragment>
+                                    <Button
+                                        color="secondary"
+                                        size="sm"
+                                        icon="clock"
+                                        onClick={() => { this.handleButtonVested(item.tx_hash) }}
+                                        disabled = {item.vested==true && Date.now() < item.vesting_end_ts ? false : true}
+                                    >
+                                        Change Vest Period
+                                    </Button>
+                                </React.Fragment>
+                            )
+                        },
                     ]
                 })
             })
@@ -107,6 +134,7 @@ class Transactions extends Component {
     }
 
     async componentDidMount() {
+        axios.defaults.headers['x-session-id'] = Cookies.get('session-id')
         try {
             if (this.props.location.state.userid) {
                 await this.setState({ userid: this.props.location.state.userid })
@@ -127,11 +155,43 @@ class Transactions extends Component {
         await this.onty(this.state.userid)
     }
 
+    async handleDateChange(date) {
+        try {
+            this.setState({
+                startDate: date,
+                loading: false,
+                datePickerOpen: false
+            })
+            this.setState({ datePickerOpen: false })
+            await axios.get(`${API_URL}/admin/vestedtschange?tx_hash=${this.state.vest_txhash}&date=${new Date(date).toISOString()}`)
+            this.onty(this.state.userid)
+            this.setState({ loading: false })
+        } catch (e) {
+            this.setState({ loading: false })
+            alert('Could not change vesting period for tx : \n' + this.state.vest_txhash + '\nMessage : ' + e.response.data.message)
+        }
+    }
+
+    async handleButtonVested(e) {
+        this.setState({ datePickerOpen: true, vest_txhash: e })
+    }
+
     render() {
         return (
             <SiteWrapper>
                 <Page.Content>
                     <Grid.Row>
+                        {
+                            this.state.datePickerOpen == true ?
+                                <DatePicker
+                                    selected={this.state.startDate}
+                                    onChange={(d) => this.handleDateChange(d)}
+                                    minDate={new Date()}
+                                    withPortal
+                                    inline /> : null
+                        }
+
+
                         <Grid.Col width={12}>
                             <Form.Input
                                 className="mb-3"
@@ -166,7 +226,7 @@ class Transactions extends Component {
                                     <Card.Header>
                                         <Card.Title>Transactions</Card.Title>
                                         <Card.Options>
-                                        <a style={{display: 'none'}} href='empty' ref={this.state.ref}>ref</a>
+                                            <a style={{ display: 'none' }} href='empty' ref={this.state.ref}>ref</a>
                                             <Button color="primary" size="sm" onClick={() => this.exportCSV()}>
                                                 Export Ledger To CSV
                                         </Button>
@@ -187,7 +247,9 @@ class Transactions extends Component {
                                             { content: "Amount" },
                                             { content: "Transaction Type" },
                                             { content: "Is Vested" },
-                                            { content: "Transaction Hash" }
+                                            { content: "To Vest on" },
+                                            { content: "Transaction Hash" },
+                                            { content: "Action" }
                                         ]}
                                         bodyItems={this.state.tableItems}
                                     />
