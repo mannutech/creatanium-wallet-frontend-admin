@@ -114,7 +114,7 @@ class Transactions extends Component {
                                         size="sm"
                                         icon="clock"
                                         onClick={() => { this.handleButtonVested(item.tx_hash) }}
-                                        disabled = {item.vested==true && Date.now() < item.vesting_end_ts ? false : true}
+                                        disabled = {item.vested==true && Date.now() < item.vesting_end_ts && item.status!=30 ? false : true}
                                     >
                                         Change Vest Period
                                     </Button>
