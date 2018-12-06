@@ -76,7 +76,7 @@ class UserLookup extends Component {
                                         Wallet Details
                                     </Button>
                                     <span> </span>
-                                    <Link to={{ pathname: '/transactions', state: { userid: item.user_id } }} props>
+                                    <Link to={{ pathname: '/transactions', state: { userid: item.user_id, symb: 'all' } }} props>
                                         <Button
                                             color="secondary"
                                             size="sm"
@@ -99,7 +99,7 @@ class UserLookup extends Component {
         }
     }
 
-    async refreshBal(coinid, address,user_id) {
+    async refreshBal(coinid, address, user_id) {
         await this.setState({ loading: true })
         await axios.get(`${API_URL}/admin/refreshbalance?coin_id=${coinid}&address=${address}`)
         await this.oncl(user_id)
@@ -137,10 +137,19 @@ class UserLookup extends Component {
                                         color="secondary"
                                         size="sm"
                                         icon="refresh-cw"
-                                        onClick={() => { this.refreshBal(item.coin_id, item.address,item.user_id) }}
+                                        onClick={() => { this.refreshBal(item.coin_id, item.address, item.user_id) }}
                                     >
                                         Refresh Balance
                                     </Button>
+                                    <span> </span>
+                                    <Link to={{ pathname: '/transactions', state: { userid: item.user_id, symb: item.coin_symbol } }} props>
+                                        <Button
+                                            color="secondary"
+                                            size="sm"
+                                        >
+                                            Transactions
+                                    </Button>
+                                    </Link>
                                 </React.Fragment>
                             ),
                         },
@@ -177,30 +186,44 @@ class UserLookup extends Component {
                                     position="append"
                                     onChange={(e) => { this.onty(e) }}
                                 />
-                                <Dimmer active={this.state.loading} loader>
-                                    <Card title="User List"
-                                        statusColor="blue">
-                                        <Table
-                                            responsive={true}
-                                            className="card-table table-vcenter text-nowrap"
-                                            headerItems={[
-                                                { content: "No.", className: "w-1" },
-                                                { content: "First Name" },
-                                                { content: "Last Name" },
-                                                { content: "Country" },
-                                                { content: "Email" },
-                                                { content: "Mobile" },
-                                                { content: "Email Verified" },
-                                                { content: null },
-                                            ]}
-                                            bodyItems={this.state.tableItems}
-                                        />
 
-                                        <Card.Footer>
-                                            {this.state.tableItems.length} user found
-                                </Card.Footer>
-                                    </Card>
-                                </Dimmer>
+                                {
+                                    this.state.tableItems.length == 0 ? (
+                                        <Card statusColor="blue">
+
+                                            <p style={{ margin: 30, textAlign: "center" }}>
+                                                <img src="images/no-result.svg" style={{ height: 160, margin: 20 }} /><br />
+                                                Results will appear here when available</p>
+                                        </Card>
+                                    ) : (
+                                            <Dimmer active={this.state.loading} loader>
+                                                <Card title="User List"
+                                                    statusColor="blue">
+                                                    <Table
+                                                        responsive={true}
+                                                        className="card-table table-vcenter text-nowrap"
+                                                        headerItems={[
+                                                            { content: "No.", className: "w-1" },
+                                                            { content: "First Name" },
+                                                            { content: "Last Name" },
+                                                            { content: "Country" },
+                                                            { content: "Email" },
+                                                            { content: "Mobile" },
+                                                            { content: "Email Verified" },
+                                                            { content: null },
+                                                        ]}
+                                                        bodyItems={this.state.tableItems}
+                                                    />
+
+                                                    <Card.Footer>
+                                                        {this.state.tableItems.length} user found
+                                                    </Card.Footer>
+                                                </Card>
+                                            </Dimmer>
+                                        )
+                                }
+
+
                             </Grid.Col>
                         </Grid.Row>
                     ) : (

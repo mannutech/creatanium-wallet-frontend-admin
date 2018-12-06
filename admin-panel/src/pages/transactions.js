@@ -39,6 +39,7 @@ class Transactions extends Component {
         userid: '',
         sort: 'desc',
         trxtype: 'all',
+        symb: 'all',
         ref: React.createRef(),
         startDate: new Date(),
         datePickerOpen: false,
@@ -46,7 +47,7 @@ class Transactions extends Component {
     }
 
     exportCSV = () => {
-        axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=all&export=true`).then(response => {
+        axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=200&sort=${this.state.sort}&symb=${this.state.symb}&export=true`).then(response => {
             let blob = new Blob([response.data], { type: 'application/octet-stream' })
             let ref = this.state.ref
             ref.current.href = URL.createObjectURL(blob)
@@ -60,7 +61,8 @@ class Transactions extends Component {
         await this.setState({ userid: v })
         try {
             await this.setState({ loading: true })
-            let { data } = await axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=all&export=false`)
+            console.log(this.state.symb)
+            let { data } = await axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=${this.state.symb}&export=false`)
             await data.data.map((item, i) => {
                 tableItems.push({
                     key: i,
@@ -114,7 +116,7 @@ class Transactions extends Component {
                                         size="sm"
                                         icon="clock"
                                         onClick={() => { this.handleButtonVested(item.tx_hash) }}
-                                        disabled = {item.vested==true && Date.now() < item.vesting_end_ts && item.status!=30 ? false : true}
+                                        disabled={item.vested == true && Date.now() < item.vesting_end_ts && item.status != 30 ? false : true}
                                     >
                                         Change Vest Period
                                     </Button>
@@ -137,11 +139,11 @@ class Transactions extends Component {
         axios.defaults.headers['x-session-id'] = Cookies.get('session-id')
         try {
             if (this.props.location.state.userid) {
-                await this.setState({ userid: this.props.location.state.userid })
+                await this.setState({ userid: this.props.location.state.userid , symb : this.props.location.state.symb })
                 await this.onty(this.props.location.state.userid)
             }
         } catch (e) {
-            await this.setState({ userid: '' })
+            await this.setState({ userid: '' , symb : 'all'})
         }
     }
 
@@ -220,42 +222,51 @@ class Transactions extends Component {
                                     </Form.Group>
                                 </Grid.Col>
                             </Grid.Row>
+                            {
+                                this.state.tableItems.length == 0 ? (
+                                    <Card statusColor="blue">
 
-                            <Dimmer active={this.state.loading} loader>
-                                <Card statusColor="blue">
-                                    <Card.Header>
-                                        <Card.Title>Transactions</Card.Title>
-                                        <Card.Options>
-                                            <a style={{ display: 'none' }} href='empty' ref={this.state.ref}>ref</a>
-                                            <Button color="primary" size="sm" onClick={() => this.exportCSV()}>
-                                                Export Ledger To CSV
+                                        <p style={{ margin: 30, textAlign: "center" }}>
+                                            <img src="images/no-result.svg" style={{ height: 160, margin: 20 }} /><br />
+                                            Results will appear here when available</p>
+                                    </Card>
+                                ) : (
+                                        <Dimmer active={this.state.loading} loader>
+                                            <Card statusColor="blue">
+                                                <Card.Header>
+                                                    <Card.Title>Transactions</Card.Title>
+                                                    <Card.Options>
+                                                        <a style={{ display: 'none' }} href='empty' ref={this.state.ref}>ref</a>
+                                                        <Button color="primary" size="sm" onClick={() => this.exportCSV()}>
+                                                            Export Ledger To CSV
                                         </Button>
-                                        </Card.Options>
-                                    </Card.Header>
-                                    <Table
-                                        responsive={true}
-                                        className="card-table table-vcenter text-nowrap"
-                                        headerItems={[
-                                            { content: "No.", className: "w-1" },
-                                            { content: "Transaction Date" },
-                                            { content: "Status" },
-                                            { content: "Originator Id" },
-                                            { content: "Beneficiary Id" },
-                                            { content: "Originator Address" },
-                                            { content: "Beneficiary Address" },
-                                            { content: "Coin Type" },
-                                            { content: "Amount" },
-                                            { content: "Transaction Type" },
-                                            { content: "Is Vested" },
-                                            { content: "To Vest on" },
-                                            { content: "Transaction Hash" },
-                                            { content: "Action" }
-                                        ]}
-                                        bodyItems={this.state.tableItems}
-                                    />
-                                    <Card.Footer>{this.state.tableItems.length} Transactions found</Card.Footer>
-                                </Card>
-                            </Dimmer>
+                                                    </Card.Options>
+                                                </Card.Header>
+                                                <Table
+                                                    responsive={true}
+                                                    className="card-table table-vcenter text-nowrap"
+                                                    headerItems={[
+                                                        { content: "No.", className: "w-1" },
+                                                        { content: "Transaction Date" },
+                                                        { content: "Status" },
+                                                        { content: "Originator Id" },
+                                                        { content: "Beneficiary Id" },
+                                                        { content: "Originator Address" },
+                                                        { content: "Beneficiary Address" },
+                                                        { content: "Coin Type" },
+                                                        { content: "Amount" },
+                                                        { content: "Transaction Type" },
+                                                        { content: "Is Vested" },
+                                                        { content: "To Vest on" },
+                                                        { content: "Transaction Hash" },
+                                                        { content: "Action" }
+                                                    ]}
+                                                    bodyItems={this.state.tableItems}
+                                                />
+                                                <Card.Footer>{this.state.tableItems.length} Transactions found</Card.Footer>
+                                            </Card>
+                                        </Dimmer>
+                                    )}
                         </Grid.Col>
                     </Grid.Row>
                 </Page.Content>
