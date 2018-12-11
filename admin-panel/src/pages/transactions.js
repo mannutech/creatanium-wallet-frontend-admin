@@ -43,7 +43,8 @@ class Transactions extends Component {
         ref: React.createRef(),
         startDate: new Date(),
         datePickerOpen: false,
-        vest_txhash: null
+        vest_txhash: null,
+        reversetrx_disabled: true
     }
 
     exportCSV = () => {
@@ -119,6 +120,15 @@ class Transactions extends Component {
                                         disabled={item.vested == true && Date.now() < item.vesting_end_ts && item.status != 30 ? false : true}
                                     >
                                         Change Vest Period
+                                    </Button> {' '}
+                                    <Button
+                                        color="secondary"
+                                        size="sm"
+                                        icon="rotate-ccw"
+                                        onClick={() => { this.handleButtonReverseTrx(item.coin_code, item.tx_hash) }}
+                                        disabled={this.state.reversetrx_disabled == false && item.status === 'Completed' ? false : true}
+                                    >
+                                        Reverse Transaction
                                     </Button>
                                 </React.Fragment>
                             )
@@ -139,12 +149,18 @@ class Transactions extends Component {
         axios.defaults.headers['x-session-id'] = Cookies.get('session-id')
         try {
             if (this.props.location.state.userid) {
-                await this.setState({ userid: this.props.location.state.userid , symb : this.props.location.state.symb })
+                // Check if account has reversetrx permission
+                let permissions = JSON.parse(Cookies.get('permissions'))
+                permissions.admin.actions.includes('reversetrx') ? await this.setState({ reversetrx_disabled: false }) : await this.setState({ reversetrx_disabled: true })
+                //
+                await this.setState({ userid: this.props.location.state.userid, symb: this.props.location.state.symb })
                 await this.onty(this.props.location.state.userid)
+
             }
         } catch (e) {
-            await this.setState({ userid: '' , symb : 'all'})
+            await this.setState({ userid: '', symb: 'all' })
         }
+
     }
 
     async onttc(v) {
@@ -176,6 +192,18 @@ class Transactions extends Component {
 
     async handleButtonVested(e) {
         this.setState({ datePickerOpen: true, vest_txhash: e })
+    }
+
+    async handleButtonReverseTrx(coin_code, tx_hash) {
+        try {
+            this.setState({ loading: true, tableItems: [this.state.tableItems[0]] })
+            await axios.get(`${API_URL}/admin/reversetrx?coin_code=${coin_code}&tx_hash=${tx_hash}`)
+            this.onty(this.state.userid)
+            this.setState({ loading: false })
+        } catch (e) {
+            this.setState({ loading: false })
+            alert(e.response.data.message)
+        }
     }
 
     render() {
