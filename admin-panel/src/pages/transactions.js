@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 import moment from 'moment'
+import has from 'lodash/has'
 
 import {
     Page,
@@ -151,7 +152,9 @@ class Transactions extends Component {
             if (this.props.location.state.userid) {
                 // Check if account has reversetrx permission
                 let permissions = JSON.parse(Cookies.get('permissions'))
-                permissions.admin.actions.includes('reversetrx') ? await this.setState({ reversetrx_disabled: false }) : await this.setState({ reversetrx_disabled: true })
+                if (has(permissions, 'admin.actions')) {
+                    permissions.admin.actions.includes('reversetrx') ? await this.setState({ reversetrx_disabled: false }) : await this.setState({ reversetrx_disabled: true })
+                }
                 //
                 await this.setState({ userid: this.props.location.state.userid, symb: this.props.location.state.symb })
                 await this.onty(this.props.location.state.userid)
