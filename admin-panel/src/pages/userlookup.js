@@ -43,59 +43,63 @@ class UserLookup extends Component {
     }
 
     async onty(a) {
-        let tableItems = []
-        try {
-            this.setState({ loading: true })
-            let { data } = await axios.get(`${API_URL}/admin/userlookup?keyword=${a.target.value}`)
-            await data.map((item, i) => {
-                tableItems.push({
-                    key: i,
-                    item: [
-                        {
-                            content: (<Text RootComponent="span" muted>{i + 1}</Text>),
-                        },
-                        {
-                            content: item.first_name,
-                        },
-                        { content: item.last_name },
-                        { content: item.country },
-                        { content: item.email },
-                        { content: item.mobile.replace('$', ' ') },
-                        {
-                            content: (
-                                <React.Fragment>
-                                    <span className={item.is_email_confirmed == true ? "status-icon bg-success" : "status-icon bg-warning"} /> {item.is_email_confirmed == true ? 'Yes' : 'No'}
-                                </React.Fragment>
-                            ),
-                        },
-                        {
-                            alignContent: "right",
-                            content: (
-                                <React.Fragment>
-                                    <Button size="sm" color="secondary" onClick={(e) => this.oncl(item.user_id)}>
-                                        Wallet Details
+        if (a.target.value.length > 2) {
+            let tableItems = []
+            try {
+                this.setState({ loading: true })
+                let { data } = await axios.get(`${API_URL}/admin/userlookup?keyword=${a.target.value}`)
+                await data.map((item, i) => {
+                    tableItems.push({
+                        key: i,
+                        item: [
+                            {
+                                content: (<Text RootComponent="span" muted>{i + 1}</Text>),
+                            },
+                            {
+                                content: item.first_name,
+                            },
+                            { content: item.last_name },
+                            { content: item.country },
+                            { content: item.email },
+                            { content: item.mobile.replace('$', ' ') },
+                            {
+                                content: (
+                                    <React.Fragment>
+                                        <span className={item.is_email_confirmed == true ? "status-icon bg-success" : "status-icon bg-warning"} /> {item.is_email_confirmed == true ? 'Yes' : 'No'}
+                                    </React.Fragment>
+                                ),
+                            },
+                            {
+                                alignContent: "right",
+                                content: (
+                                    <React.Fragment>
+                                        <Button size="sm" color="secondary" onClick={(e) => this.oncl(item.user_id)}>
+                                            Wallet Details
                                     </Button>
-                                    <span> </span>
-                                    <Link to={{ pathname: '/transactions', state: { userid: item.user_id, symb: 'all' } }} props>
-                                        <Button
-                                            color="secondary"
-                                            size="sm"
-                                        >
-                                            Transactions
+                                        <span> </span>
+                                        <Link to={{ pathname: '/transactions', state: { userid: item.user_id, symb: 'all' } }} props>
+                                            <Button
+                                                color="secondary"
+                                                size="sm"
+                                            >
+                                                Transactions
                                     </Button>
-                                    </Link>
-                                </React.Fragment>
-                            ),
-                        }
-                    ]
+                                        </Link>
+                                    </React.Fragment>
+                                ),
+                            }
+                        ]
+                    })
                 })
-            })
 
-            await this.setState({ tableItems: tableItems })
-            await this.setState({ loading: false })
-        } catch (e) {
+                await this.setState({ tableItems: tableItems })
+                await this.setState({ loading: false })
+            } catch (e) {
+                await this.setState({ tableItems: [] })
+                await this.setState({ loading: false })
+            }
+        }else {
             await this.setState({ tableItems: [] })
-            await this.setState({ loading: false })
         }
     }
 
@@ -188,7 +192,7 @@ class UserLookup extends Component {
                                 />
 
                                 {
-                                    this.state.tableItems.length == 0 ? (
+                                    this.state.tableItems.length == 0 && this.state.loading == false ? (
                                         <Card statusColor="blue">
 
                                             <p style={{ margin: 30, textAlign: "center" }}>

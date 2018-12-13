@@ -118,7 +118,7 @@ class Transactions extends Component {
                                         size="sm"
                                         icon="clock"
                                         onClick={() => { this.handleButtonVested(item.tx_hash) }}
-                                        disabled={item.vested == true && Date.now() < item.vesting_end_ts && item.status != 30 ? false : true}
+                                        disabled={item.vested == true && Date.now() < item.vesting_end_ts && item.status != 'Failed' ? false : true}
                                     >
                                         Change Vest Period
                                     </Button> {' '}
@@ -204,7 +204,7 @@ class Transactions extends Component {
             this.onty(this.state.userid)
             this.setState({ loading: false })
         } catch (e) {
-            this.setState({ loading: false })
+            this.setState({ loading: false, tableItems: [] })
             alert(e.response.data.message)
         }
     }
@@ -254,9 +254,8 @@ class Transactions extends Component {
                                 </Grid.Col>
                             </Grid.Row>
                             {
-                                this.state.tableItems.length == 0 ? (
+                                this.state.tableItems.length == 0 && this.state.loading == false ? (
                                     <Card statusColor="blue">
-
                                         <p style={{ margin: 30, textAlign: "center" }}>
                                             <img src="images/no-result.svg" style={{ height: 160, margin: 20 }} /><br />
                                             Results will appear here when available</p>
