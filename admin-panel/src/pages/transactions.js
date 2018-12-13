@@ -49,7 +49,7 @@ class Transactions extends Component {
     }
 
     exportCSV = () => {
-        axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=200&sort=${this.state.sort}&symb=${this.state.symb}&export=true`).then(response => {
+        axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=500&sort=${this.state.sort}&symb=${this.state.symb}&export=true`).then(response => {
             let blob = new Blob([response.data], { type: 'application/octet-stream' })
             let ref = this.state.ref
             ref.current.href = URL.createObjectURL(blob)
