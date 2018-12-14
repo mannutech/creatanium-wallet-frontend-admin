@@ -35,6 +35,7 @@ class UserLookup extends Component {
         tableItems1: [],
         loading: false,
         toggleWalletCard: true,
+        searchTerm: '',
         userid: Cookies.get('userid')
     }
 
@@ -43,6 +44,7 @@ class UserLookup extends Component {
     }
 
     async onty(a) {
+        this.setState({ searchTerm: a.target.value })
         if (a.target.value.length > 2) {
             let tableItems = []
             try {
@@ -85,6 +87,15 @@ class UserLookup extends Component {
                                                 Transactions
                                     </Button>
                                         </Link>
+                                        <span> </span>
+                                        <Button
+                                            color="secondary"
+                                            size="sm"
+                                            onClick={(e) => this.onEmailConfirm(item.user_id, item.email)}
+                                            disabled={item.is_email_confirmed == true ? true : false}
+                                        >
+                                            Confirm Email
+                                    </Button>
                                     </React.Fragment>
                                 ),
                             }
@@ -98,8 +109,19 @@ class UserLookup extends Component {
                 await this.setState({ tableItems: [] })
                 await this.setState({ loading: false })
             }
-        }else {
+        } else {
             await this.setState({ tableItems: [] })
+        }
+    }
+
+    async onEmailConfirm(user_id, email) {
+        try {
+            await this.setState({ loading: true })
+            let r = await axios.get(`${API_URL}/admin/emailconfirm?user_id=${user_id}&email=${email}`)
+            this.onty({ target: { value: this.state.searchTerm } })
+        } catch (e) {
+            await this.setState({ loading: false })
+            alert(e.response.data.message)
         }
     }
 
