@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { NavLink, withRouter, Redirect, Link, LinkProps } from "react-router-dom";
-
+import moment from 'moment'
 
 import {
     Site,
@@ -16,11 +16,19 @@ import Cookies from 'js-cookie'
 const notificationsObjects = [
     {
         message: (
+        <React.Fragment>
+                Last <strong>updated</strong> on Jan 11 2019.
+        </React.Fragment>
+        ),
+        time: moment([2019,0,11]).fromNow(),
+    },
+    {
+        message: (
             <React.Fragment>
                 This is <strong>alpha</strong> version of creatanium wallet administrator panel.
         </React.Fragment>
         ),
-        time: "1 minutes ago",
+        time: moment([2018,10,20]).fromNow(),
     }
 ];
 

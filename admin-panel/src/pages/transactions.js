@@ -64,7 +64,7 @@ class Transactions extends Component {
         try {
             await this.setState({ loading: true })
             console.log(this.state.symb)
-            let { data } = await axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=100&sort=${this.state.sort}&symb=${this.state.symb}&export=false`)
+            let { data } = await axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=1000&sort=${this.state.sort}&symb=${this.state.symb}&export=false`)
             await data.data.map((item, i) => {
                 tableItems.push({
                     key: i,
