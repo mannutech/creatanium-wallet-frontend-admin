@@ -45,11 +45,12 @@ class Transactions extends Component {
         startDate: new Date(),
         datePickerOpen: false,
         vest_txhash: null,
-        reversetrx_disabled: true
+        reversetrx_disabled: true,
+        limit : '100'
     }
 
     exportCSV = () => {
-        axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=500&sort=${this.state.sort}&symb=${this.state.symb}&export=true`).then(response => {
+        axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=${this.state.limit}&sort=${this.state.sort}&symb=${this.state.symb}&export=true`).then(response => {
             let blob = new Blob([response.data], { type: 'application/octet-stream' })
             let ref = this.state.ref
             ref.current.href = URL.createObjectURL(blob)
@@ -60,11 +61,11 @@ class Transactions extends Component {
 
     async onty(v) {
         let tableItems = []
-        await this.setState({ userid: v })
+        await this.setState({ userid: v , tableItems : []})
         try {
             await this.setState({ loading: true })
             console.log(this.state.symb)
-            let { data } = await axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=1000&sort=${this.state.sort}&symb=${this.state.symb}&export=false`)
+            let { data } = await axios.get(`${API_URL}/admin/transactionlookup?user_id=${this.state.userid}&rangestart=0&rangeend=1937526914630&trxtype=${this.state.trxtype}&amountlimit=0&limit=${this.state.limit}&sort=${this.state.sort}&symb=${this.state.symb}&export=false`)
             await data.data.map((item, i) => {
                 tableItems.push({
                     key: i,
@@ -156,7 +157,7 @@ class Transactions extends Component {
                     permissions.admin.actions.includes('reversetrx') ? await this.setState({ reversetrx_disabled: false }) : await this.setState({ reversetrx_disabled: true })
                 }
                 //
-                await this.setState({ userid: this.props.location.state.userid, symb: this.props.location.state.symb })
+                await this.setState({ userid: this.props.location.state.userid, symb: this.props.location.state.symb, limit : '25' })
                 await this.onty(this.props.location.state.userid)
 
             }
@@ -173,6 +174,11 @@ class Transactions extends Component {
 
     async onsc(v) {
         await this.setState({ sort: v })
+        await this.onty(this.state.userid)
+    }
+
+    async onlc(v) {
+        await this.setState({ limit: v })
         await this.onty(this.state.userid)
     }
 
@@ -235,7 +241,7 @@ class Transactions extends Component {
                                 onChange={(e) => { this.onty(e.target.value) }}
                             />
                             <Grid.Row>
-                                <Grid.Col width={6}>
+                                <Grid.Col width={4}>
                                     <Form.Group label="Transaction Type">
                                         <Form.Select value={this.state.trxtype} onChange={(e) => { this.onttc(e.target.value) }}>
                                             <option value="all">All</option>
@@ -244,11 +250,23 @@ class Transactions extends Component {
                                         </Form.Select>
                                     </Form.Group>
                                 </Grid.Col>
-                                <Grid.Col width={6}>
+                                <Grid.Col width={4}>
                                     <Form.Group label="Sort">
                                         <Form.Select value={this.state.sort} onChange={(e) => { this.onsc(e.target.value) }}>
                                             <option value="asc">Ascending</option>
                                             <option value="desc">Descending</option>
+                                        </Form.Select>
+                                    </Form.Group>
+                                </Grid.Col>
+                                <Grid.Col width={4}>
+                                    <Form.Group label="Record Limit">
+                                        <Form.Select value={this.state.limit} onChange={(e) => { this.onlc(e.target.value) }}>
+                                            <option value='25'>25</option>
+                                            <option value='100'>100</option>
+                                            <option value='500'>500</option>
+                                            <option value='1000'>1000</option>
+                                            <option value='2000'>2000</option>
+                                            <option value='10000'> > 5000</option>
                                         </Form.Select>
                                     </Form.Group>
                                 </Grid.Col>

@@ -17,10 +17,18 @@ const notificationsObjects = [
     {
         message: (
         <React.Fragment>
-                Last <strong>updated</strong> on Jan 11 2019.
+                Last <strong>updated</strong> on March 11 2019.
         </React.Fragment>
         ),
-        time: moment([2019,0,11]).fromNow(),
+        time: moment([2019,2,11]).fromNow(),
+    },
+    {
+        message: (
+            <React.Fragment>
+                <strong>Record limit</strong> filter added.
+        </React.Fragment>
+        ),
+        time: moment([2019,2,11]).fromNow(),
     },
     {
         message: (
