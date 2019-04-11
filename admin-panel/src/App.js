@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 
-import { Login, Signup, UserLookup, Transactions } from './pages'
+import { Login, Signup, UserLookup, Transactions, buyCMB } from './pages'
 
 import Cookies from 'js-cookie'
 import qs from 'qs'
@@ -62,6 +62,7 @@ class App extends Component {
           <PrivateOnlyRoute exact path="/" component={UserLookup} />
           <PrivateOnlyRoute exact path="/user-lookup" component={UserLookup} />
           <PrivateOnlyRoute exact path="/transactions" component={Transactions} />
+          <PrivateOnlyRoute exact path="/buy-cmb" component={buyCMB} />
         </React.Fragment>
       </Router>
     );

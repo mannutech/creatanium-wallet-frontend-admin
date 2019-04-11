@@ -44,7 +44,9 @@ const notificationsObjects = [
 
 const navBarItems = [
     { value: "User Lookup", to: "/user-lookup", icon: "search", LinkComponent: withRouter(NavLink) },
-    { value: "Transactions", to: "/transactions", icon: "codepen", LinkComponent: withRouter(NavLink) }
+    { value: "Transactions", to: "/transactions", icon: "codepen", LinkComponent: withRouter(NavLink) },
+    { value: " Buy CMB", to: "/buy-cmb", icon: "shopping-bag", LinkComponent: withRouter(NavLink) }
+
 ]
 
 class SiteWrapper extends Component {
