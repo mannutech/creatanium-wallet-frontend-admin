@@ -16,11 +16,11 @@ import Cookies from 'js-cookie'
 const notificationsObjects = [
     {
         message: (
-        <React.Fragment>
+            <React.Fragment>
                 Last <strong>updated</strong> on March 11 2019.
         </React.Fragment>
         ),
-        time: moment([2019,2,11]).fromNow(),
+        time: moment([2019, 2, 11]).fromNow(),
     },
     {
         message: (
@@ -28,7 +28,7 @@ const notificationsObjects = [
                 <strong>Record limit</strong> filter added.
         </React.Fragment>
         ),
-        time: moment([2019,2,11]).fromNow(),
+        time: moment([2019, 2, 11]).fromNow(),
     },
     {
         message: (
@@ -36,22 +36,23 @@ const notificationsObjects = [
                 This is <strong>alpha</strong> version of creatanium wallet administrator panel.
         </React.Fragment>
         ),
-        time: moment([2018,10,20]).fromNow(),
+        time: moment([2018, 10, 20]).fromNow(),
     }
 ];
 
 
 
-const navBarItems = [
-    { value: "User Lookup", to: "/user-lookup", icon: "search", LinkComponent: withRouter(NavLink) },
-    { value: "Transactions", to: "/transactions", icon: "codepen", LinkComponent: withRouter(NavLink) },
-    { value: " Buy CMB", to: "/buy-cmb", icon: "shopping-bag", LinkComponent: withRouter(NavLink) }
 
-]
+
+
 
 class SiteWrapper extends Component {
 
-    state = { logout: false }
+    state = {
+        logout: false,
+        navBarItems: [{ value: "User Lookup", to: "/user-lookup", icon: "search", LinkComponent: withRouter(NavLink) },
+        { value: "Transactions", to: "/transactions", icon: "codepen", LinkComponent: withRouter(NavLink) }]
+    }
 
     async handleLogout() {
         await Cookies.remove('session-id')
@@ -59,14 +60,24 @@ class SiteWrapper extends Component {
         await Cookies.remove('email')
         await Cookies.remove('userid')
         await Cookies.remove('permissions')
-        this.setState({logout : true})
+        this.setState({ logout: true })
+    }
+
+
+    async componentDidMount() {
+        let permissions = JSON.parse(await Cookies.get('permissions'))
+        if (permissions.admin.actions.includes('buycrypto')) {
+            let nbi = this.state.navBarItems
+            nbi.push({ value: " Buy CMB", to: "/buy-cmb", icon: "shopping-bag", LinkComponent: withRouter(NavLink) })
+            this.setState({ navBarItems: nbi })
+        }
     }
 
     render() {
         if (this.state.logout)
             return (<Redirect to={{
                 pathname: '/',
-                state: { }
+                state: {}
             }} />)
 
         return (
@@ -86,7 +97,7 @@ class SiteWrapper extends Component {
                         ],
                     }
                 }}
-                navProps={{ itemsObjects: navBarItems }}
+                navProps={{ itemsObjects: this.state.navBarItems }}
                 routerContextComponentType={withRouter(RouterContextProvider)}
                 footerProps={{
                     copyright: (

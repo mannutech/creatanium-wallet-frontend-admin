@@ -42,24 +42,25 @@ class buyCMB extends Component {
         toggleWalletCard: true,
         searchTerm: '',
         userid: Cookies.get('userid'),
+        buttonLoading: false
 
     }
 
     async componentDidMount() {
         axios.defaults.headers['x-session-id'] = Cookies.get('session-id')
-        await this.onty({target : { value : 'pending'}})
+        await this.onty({ target: { value: 'pending' } })
     }
 
     async onty(a) {
-        console.log(a)
         await this.setState({ searchTerm: a.target.value })
-        if (a.target.value.length > 2) {
+        if (this.state.searchTerm.length > 2) {
             let tableItems = []
             try {
                 this.setState({ loading: true })
-                let { data } = await axios.get(`${API_URL}/admin/add-funds/buy?status=${a.target.value}`)
+                let { data } = await axios.get(`${API_URL}/admin/add-funds/buy?status=${this.state.searchTerm}`)
                 data = data.data.buyRequest
                 await data.map((item, i) => {
+                    item['loading'] = false
                     tableItems.push({
                         key: i,
                         item: [
@@ -100,17 +101,18 @@ class buyCMB extends Component {
                                         <Button
                                             color="secondary"
                                             size="sm"
-                                            onClick={(e) => this.onCancelClick(item.buy_id)}
+                                            onClick={(e) => this.onCancelClick(item.buy_id,i)}
+                                            loading={item.loading}
                                             disabled={item.status == 10 ? false : true}>
                                             Cancel
                                         </Button>
                                     </React.Fragment>
                                 ),
                             }
-                        ]
+                        ],
+                        buyId : item.buy_id
                     })
                 })
-
                 await this.setState({ tableItems: tableItems })
                 await this.setState({ loading: false })
             } catch (e) {
@@ -122,13 +124,37 @@ class buyCMB extends Component {
         }
     }
 
+    async onClickResend(type) {
+        try {
+            await this.setState({ loadingButton: true })
+            let r = await axios.post(`${API_URL}/admin/add-funds/resendEmail`, {
+                buy_id: this.state.tableItems1.buy_id,
+                emailType: type
+            })
+            await this.setState({ loadingButton: false })
+        } catch (e) {
+            await this.setState({ loadingButton: false })
+            alert(e.response.data.message)
+        }
+    }
+
+
     async onCancelClick(buy_id) {
         try {
             await this.setState({ loading: true })
             let r = await axios.post(`${API_URL}/admin/add-funds/cancel`, {
                 buy_id: buy_id
             })
-            this.onty({ target: { value: this.state.searchTerm } })
+
+            let tableArr = this.state.tableItems
+            console.log(tableArr[0])
+            let arrIndex = _.findIndex(tableArr, { buyId: '7d298bc6-0548-4e6b-9f9d-433d907d2372' })
+            console.log(arrIndex)
+            tableArr.splice(arrIndex, 1)
+
+            await this.setState({ tableItems: tableArr })
+            await this.setState({ loading: false })
+            //this.onty({ target: { value: this.state.searchTerm } })
         } catch (e) {
             await this.setState({ loading: false })
             alert(e.response.data.message)
@@ -152,6 +178,7 @@ class buyCMB extends Component {
 
     async oncl(a) {
         try {
+            console.log(a)
             await this.setState({ tableItems1: a })
             await this.setState({ toggleWalletCard: false })
         } catch (e) {
@@ -170,7 +197,7 @@ class buyCMB extends Component {
                     {this.state.toggleWalletCard == true ? (
                         <Grid.Row>
                             <Grid.Col width={12}>
-                            <Alert type="primary" isDismissible>
+                                <Alert type="primary" isDismissible>
                                     <strong>You can type </strong> all, pending, cancelled or processed to filter the requests.
                             </Alert>
 
@@ -179,6 +206,7 @@ class buyCMB extends Component {
                                     icon="search"
                                     placeholder="Type all, pending, cancelled or processed to filter the requests"
                                     position="append"
+                                    value={this.state.searchTerm}
                                     onChange={(e) => { this.onty(e) }}
                                 />
 
@@ -296,9 +324,9 @@ class buyCMB extends Component {
                                                 <ContactCard
                                                     cardTitle={<React.Fragment><Icon name="clipboard" /> Scheme Details</React.Fragment>}
                                                     details={[
-                                                        { title: "Scheme Name", content: "0 Day Plan" },
-                                                        { title: "Scheme Duration", content: "0" },
-                                                        { title: "Scheme Reward Percent", content: "10" }
+                                                        { title: "Scheme Name", content: this.state.tableItems1.scheme_doc.scheme_name },
+                                                        { title: "Scheme Duration", content: this.state.tableItems1.scheme_doc.scheme_duration_days + ' days'},
+                                                        { title: "Scheme Reward Percent", content: this.state.tableItems1.scheme_doc.reward_percent }
                                                     ]}
                                                 />
 
@@ -306,22 +334,23 @@ class buyCMB extends Component {
                                                     cardTitle={<React.Fragment><Icon name="briefcase" /> Bank Details</React.Fragment>}
                                                     details={[
 
-                                                        { title: "Bank Name", content: "CIMB Bank Berhad - SGD" },
-                                                        { title: "Bank Branch", content: "Raffles Place Branch" },
+                                                        { title: "Bank Name", content: this.state.tableItems1.bank_doc.bank_name },
+                                                        { title: "Bank Branch", content: this.state.tableItems1.bank_doc.branch_name },
 
-                                                        { title: "Bank Code", content: "7986" },
-                                                        { title: "Branch Code", content: "2312" },
+                                                        { title: "Bank Code", content: this.state.tableItems1.bank_doc.bank_code },
 
-                                                        { title: "Account No", content: "2000599451" },
-                                                        { title: "SWIFT Code", content: "CIBBSGSG" },
+                                                        { title: "Account No", content: this.state.tableItems1.bank_doc.account_no },
+                                                        { title: "SWIFT Code", content: this.state.tableItems1.bank_doc.SWIFT_code },
 
                                                     ]}
                                                 />
                                             </Card.Body>
                                             <Card.Footer>
-                                                <Button color="secondary" size="sm">Resend Request Email</Button>
+                                                <Button color="secondary" size="sm" loading={this.state.loadingButton} disabled={this.state.loadingButton || this.state.tableItems1.status != 10} onClick={() => { this.onClickResend('buyRequest') }}>Resend Request Email</Button>
                                                 <span> </span>
-                                                <Button color="secondary" size="sm">Resend Processed Email</Button>
+                                                <Button color="secondary" size="sm" loading={this.state.loadingButton} disabled={this.state.loadingButton || this.state.tableItems1.status != 20} onClick={() => { this.onClickResend('buyProcessed') }}>Resend Processed Email</Button>
+                                                <span> </span>
+                                                <Button color="secondary" size="sm" loading={this.state.loadingButton} disabled={this.state.loadingButton || this.state.tableItems1.status != 30} onClick={() => { this.onClickResend('buyCancelled') }}>Resend Cancelled Email</Button>
                                             </Card.Footer>
                                         </Card>
                                     </Dimmer>

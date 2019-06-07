@@ -23,6 +23,7 @@ class Login extends Component {
             await Cookies.set('email',data.data.email)
             await Cookies.set('userid',data.data.userid)
             await Cookies.set('permissions',data.data.permissions)
+            console.log(data.data.permissions)
             await this.setState({ loading: false, error: false, errormsg: '' })
             this.props.history.push('/')
         } catch (e) {
