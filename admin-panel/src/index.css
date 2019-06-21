@@ -12,3 +12,45 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+#root > div > div > div.page-content > div > div > div.card-header > div > input {
+  height : 0.90rem
+}
+
+#root > div > div > div.page-content > div > div > div.card-body > div.margin-bottom-24 {
+  margin-bottom: 0.2rem !important
+}
+
+
+#root > div > div > div.page-content > div > div > div.card-body {
+  padding: 0rem 0rem 0.5rem 0rem;
+}
+
+#root > div > div > div.page-content > div > div.row.row.gutters-xs > div.col.col-12.col-sm-5.col-lg-4 > div > div.card-body > div > span > div {
+  padding-top : 0.25rem;
+  margin-top : 0rem;
+}
+
+#root > div > div > div.page-content > div > span > div > div.card-body > div > div.col.col-12.col-sm-5.col-lg-8 > div.card > div.card-body > div {
+  margin-bottom: 0.5rem
+}
+#root > div > div > div.page-content > div > span > div > div.card-body > div > div.col.col-12.col-sm-12.col-lg-8 > div.card > div.card-body > div {
+  margin-bottom: 0.5rem
+}
+
+#root > div > div > div.page-content > div > div.row.row.gutters-xs > div.col.col-12.col-sm-5.col-lg-8 > div.card > div.card-body > div > div > button {
+  font-size: 12px;
+  font-weight : 600;
+}
+
+#root > div > div > div.page-content > div > div.card > div.card-body > ul > li:nth-child(1) {
+  margin-left: 1rem;
+}
+
+#root > div > div > div.page-content > div > div:nth-child(2) > div.card-body {
+  padding: 1rem;
+}
+
+#root > div > div > div.page-content > div > span > div > div.card-body > div > div.col.col-12.col-sm-12.col-lg-4 > div > div.card-body > div > span:nth-child(4) > ul > li > div > strong {
+  font-weight: 400
+}

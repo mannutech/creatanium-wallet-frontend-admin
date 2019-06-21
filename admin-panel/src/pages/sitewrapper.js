@@ -50,7 +50,9 @@ class SiteWrapper extends Component {
 
     state = {
         logout: false,
-        navBarItems: [{ value: "User Lookup", to: "/user-lookup", icon: "search", LinkComponent: withRouter(NavLink) },
+        navBarItems: [
+            { value: "Buy", to: "/buy", icon: "codepen", LinkComponent: withRouter(NavLink) },
+            { value: "User Lookup", to: "/user-lookup", icon: "search", LinkComponent: withRouter(NavLink) },
         { value: "Transactions", to: "/transactions", icon: "codepen", LinkComponent: withRouter(NavLink) }]
     }
 
@@ -99,7 +101,7 @@ class SiteWrapper extends Component {
                 }}
                 navProps={{ itemsObjects: this.state.navBarItems }}
                 routerContextComponentType={withRouter(RouterContextProvider)}
-                footerProps={{
+                /* footerProps={{
                     copyright: (
                         <React.Fragment>
                             Copyright © 2018
@@ -128,7 +130,7 @@ class SiteWrapper extends Component {
                             </Grid.Col>
                         </React.Fragment>
                     ),
-                }}
+                }} */
             >
 
                 {this.props.children}

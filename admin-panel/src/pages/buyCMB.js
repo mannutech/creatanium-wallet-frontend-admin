@@ -57,7 +57,7 @@ class buyCMB extends Component {
             let tableItems = []
             try {
                 this.setState({ loading: true })
-                let { data } = await axios.get(`${API_URL}/admin/add-funds/buy?status=${this.state.searchTerm}`)
+                let { data } = await axios.get(`${API_URL}/admin/add-funds/request/lookup?status=${this.state.searchTerm}`)
                 data = data.data.buyRequest
                 await data.map((item, i) => {
                     item['loading'] = false
