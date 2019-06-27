@@ -7,10 +7,11 @@ import { API_URL } from '../constants.js'
 import moment from 'moment'
 import ReactToPrint from 'react-to-print';
 import EdiText from 'react-editext'
+import { NavLink, withRouter, Redirect, Link, LinkProps } from "react-router-dom";
 
 import SiteWrapper from './sitewrapper'
 import Modal from 'react-responsive-modal'
-
+import _ from 'lodash'
 import '../index.css'
 
 class Buy extends Component {
@@ -168,7 +169,7 @@ class Buy extends Component {
         modalInternalNoteEditSelectedId: "",
         modalNoteErrorMessage: "",
         userNotes: [],
-        internalNotes: []
+        internalNotes: [],
     }
 
     async componentDidMount() {
@@ -225,9 +226,9 @@ class Buy extends Component {
                 }
             } catch (e) {
                 this.setState({ alertText: 'Request Failed ', alertVisible: true, alertType: 'danger' })
-            } finally {
-
             }
+        } finally {
+            this.handleGetRequestDetails()
         }
     }
 
@@ -249,9 +250,9 @@ class Buy extends Component {
                 }
             } catch (e) {
                 this.setState({ alertText: 'Request Failed ', alertVisible: true, alertType: 'danger' })
-            } finally {
-
             }
+        } finally {
+            this.handleGetRequestDetails()
         }
     }
 
@@ -282,13 +283,13 @@ class Buy extends Component {
 
     async handleGetRequestDetails(buyId = this.state.requestData.overview.buyId) {
         try {
-            window.scrollTo(0, 0)
+            this.state.requestDetailCardVisible != true && window.scrollTo(0, 0)
             let { data } = await axios.get(`${API_URL}/admin/add-funds/request/details?buyId=${buyId}`)
             await this.setState({ requestData: data.data.buyRequest, requestDetailCardVisible: true, loading: false })
             await this.fetchUserNotes()
             await this.fetchInternalNotes()
         } catch (e) {
-
+            window.scrollTo(0, 0)
             try {
                 if (e.response.status >= 400 && e.response.status <= 500) {
                     this.setState({ alertText: e.response.data, alertVisible: true, alertType: 'danger' })
@@ -432,12 +433,16 @@ class Buy extends Component {
 
             try {
                 if (e.response.status >= 400 && e.response.status < 500) {
-                    this.setState({ alertText: e.response.data, alertVisible: true, alertType: 'danger' })
+                    if (e.response.data.statusCode === 401) {
+                        this.handleLogout()
+                    }
+                    this.setState({ alertText: e.response.data.constructor.name == 'String' ? e.response.data : 'Error', alertVisible: true, alertType: 'danger', [tableName]: [] })
                 } else {
                     throw "unknown"
                 }
             } catch (e) {
-                this.setState({ alertText: 'Could not load the transaction list', alertVisible: true, alertType: 'danger' })
+                console.log(e)
+                this.setState({ alertText: 'Could not load the transaction list', alertVisible: true, alertType: 'danger', [tableName]: [] })
             } finally {
                 await this.setState({ [tableName]: [] })
                 await this.setState({ loading: false })
@@ -596,8 +601,8 @@ class Buy extends Component {
                 remarkId: this.state.modalInternalNoteEditSelectedId,
                 remark: this.state.modalInternalNoteMessage
             })
-           await this.setState({ modalInternalNoteEditMode: false, modalInternalNoteEditSelectedId: '', modalInternalNoteOpen: false })
-           await this.fetchInternalNotes()
+            await this.setState({ modalInternalNoteEditMode: false, modalInternalNoteEditSelectedId: '', modalInternalNoteOpen: false })
+            await this.fetchInternalNotes()
         } catch (e) {
             try {
                 if (e.response.status >= 400 && e.response.status <= 500) {
@@ -651,7 +656,24 @@ class Buy extends Component {
         }
     }
 
+
+    async handleLogout() {
+        await Cookies.remove('session-id')
+        await Cookies.remove('name')
+        await Cookies.remove('email')
+        await Cookies.remove('userid')
+        await Cookies.remove('permissions')
+        this.setState({ logout: true })
+    }
+
     render() {
+
+        if (this.state.logout)
+            return (<Redirect to={{
+                pathname: '/',
+                state: {}
+            }} />)
+
         return (
             <SiteWrapper>
                 <Page.Content>
@@ -1259,7 +1281,7 @@ class Buy extends Component {
                                         </Card>
 
                                         <Card title="Print Preview" isCollapsible isCollapsed={true}>
-                                            <ComponentToPrint userNotes={this.state.userNotes} requestData={this.state.requestData} ref={el => (this.componentRef = el)} />
+                                            <ComponentToPrint notes={this.state.userNotes} requestData={this.state.requestData} ref={el => (this.componentRef = el)} />
                                         </Card>
 
                                     </Grid.Col>
@@ -1281,6 +1303,14 @@ class Buy extends Component {
                                                         </Form.StaticText>
                                                         <Form.StaticText>
                                                             {moment(this.state.requestData.overview.requestDate).format("h:mm:ss A DD-MMMM-YYYY ")}
+                                                        </Form.StaticText>
+                                                    </span>
+                                                    <span>
+                                                        <Form.StaticText>
+                                                            <strong>Request Processed On</strong>
+                                                        </Form.StaticText>
+                                                        <Form.StaticText>
+                                                            {this.state.requestData.overview.confirmationDate == '' ? 'Not Processed Yet' : moment(this.state.requestData.overview.confirmationDate).format("h:mm:ss A DD-MMMM-YYYY ")}
                                                         </Form.StaticText>
                                                     </span>
                                                     <span>
@@ -1383,7 +1413,12 @@ class Buy extends Component {
                         </Card.Body>
                     </Card> */}
 
-                    <Modal open={this.state.modalUserNoteOpen} onClose={() => { this.setState({ modalUserNoteOpen: false, modalUserNoteEditMode: false, modalUserNoteEditSelectedId: '' }) }} center animationDuration={50}>
+                    <Modal open={this.state.modalUserNoteOpen}
+                        onClose={() => { this.setState({ modalUserNoteOpen: false, modalUserNoteEditMode: false, modalUserNoteEditSelectedId: '' }) }}
+                        center
+                        animationDuration={100}
+                        styles={{ overlay: { backgroundColor: '#f5f6fb' } }}
+                    >
                         <div style={{ padding: '1rem', width: '35rem' }}>
                             <Form.StaticText>
                                 Title
@@ -1415,7 +1450,12 @@ class Buy extends Component {
                         </div>
                     </Modal>
 
-                    <Modal open={this.state.modalInternalNoteOpen} onClose={() => { this.setState({ modalInternalNoteOpen: false, modalInternalNoteEditMode: false, modalInternalNoteEditSelectedId: '' }) }} center animationDuration={50}>
+                    <Modal open={this.state.modalInternalNoteOpen}
+                        onClose={() => { this.setState({ modalInternalNoteOpen: false, modalInternalNoteEditMode: false, modalInternalNoteEditSelectedId: '' }) }}
+                        center
+                        animationDuration={100}
+                        styles={{ overlay: { backgroundColor: '#f5f6fb' } }}
+                    >
                         <div style={{ padding: '1rem', width: '35rem' }}>
                             <Form.StaticText>
                                 Message
@@ -1596,7 +1636,7 @@ class ComponentToPrint extends React.Component {
                     headerItems={[
                         { content: "Items" }
                     ]}
-                    bodyItems={this.props.userNotes}
+                    bodyItems={printVersionNotesTable(this.props.notes)}
                 />
             </div>
 
@@ -1605,10 +1645,11 @@ class ComponentToPrint extends React.Component {
 }
 
 function printVersionNotesTable(table) {
-    for (let r of table) {
+    let t = _.cloneDeep(table)
+    for (let r of t) {
         r['item'].pop()
     }
-    return table
+    return t
 }
 
 export default Buy

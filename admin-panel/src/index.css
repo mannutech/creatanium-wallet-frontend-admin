@@ -52,7 +52,7 @@ code {
   padding: 1rem;
 }
 
-#root>div>div>div.page-content>div>span>div>div.card-body>div>div.col.col-12.col-sm-12.col-lg-4>div>div.card-body>div>span:nth-child(4)>ul>li>div>strong {
+#root>div>div>div.page-content>div>span>div>div.card-body>div>div.col.col-12.col-sm-12.col-lg-4>div>div.card-body>div>span:nth-child(5)>ul>li>div>strong {
   font-weight: 400
 }
 
@@ -61,7 +61,7 @@ div.styles_Editext__buttons_container__1kphL>button {
 }
 
 div.styles_Editext__editing_container__3yvUv>input {
-  padding: 0em
+  padding: 0em 0.5em 0em 0.5em
 }
 
 div.styles_Editext__editing_container__3yvUv>div>button.styles_Editext__button__6H8n_.styles_Editext__save_button__3WN6q.styles_Editext__hide_default_icons__AV_7m {
@@ -88,3 +88,4 @@ div.styles_Editext__buttons_container__1kphL>button {
 #root > div > div > div.page-content > div > span > div > div.card-body > div > div.col.col-12.col-sm-12.col-lg-8 > div:nth-child(4) > div.card-body{
   padding : 0rem
 }
+

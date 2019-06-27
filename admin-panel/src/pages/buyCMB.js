@@ -42,8 +42,8 @@ class buyCMB extends Component {
         toggleWalletCard: true,
         searchTerm: '',
         userid: Cookies.get('userid'),
-        buttonLoading: false
-
+        buttonLoading: false,
+        logout :false
     }
 
     async componentDidMount() {
@@ -191,6 +191,9 @@ class buyCMB extends Component {
 
 
     render() {
+
+     
+
         return (
             <SiteWrapper>
                 <Page.Content>
