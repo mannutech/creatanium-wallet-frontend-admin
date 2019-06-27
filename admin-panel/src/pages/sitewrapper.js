@@ -51,9 +51,8 @@ class SiteWrapper extends Component {
     state = {
         logout: false,
         navBarItems: [
-            { value: "Buy", to: "/buy", icon: "codepen", LinkComponent: withRouter(NavLink) },
             { value: "User Lookup", to: "/user-lookup", icon: "search", LinkComponent: withRouter(NavLink) },
-        { value: "Transactions", to: "/transactions", icon: "codepen", LinkComponent: withRouter(NavLink) }]
+            { value: "Transactions", to: "/transactions", icon: "codepen", LinkComponent: withRouter(NavLink) }]
     }
 
     async handleLogout() {
@@ -70,7 +69,7 @@ class SiteWrapper extends Component {
         let permissions = JSON.parse(await Cookies.get('permissions'))
         if (permissions.admin.actions.includes('buycrypto')) {
             let nbi = this.state.navBarItems
-            nbi.push({ value: " Buy CMB", to: "/buy-cmb", icon: "shopping-bag", LinkComponent: withRouter(NavLink) })
+            nbi.push({ value: " Buy", to: "/buy", icon: "shopping-bag", LinkComponent: withRouter(NavLink) })
             this.setState({ navBarItems: nbi })
         }
     }
@@ -101,36 +100,36 @@ class SiteWrapper extends Component {
                 }}
                 navProps={{ itemsObjects: this.state.navBarItems }}
                 routerContextComponentType={withRouter(RouterContextProvider)}
-                /* footerProps={{
-                    copyright: (
-                        <React.Fragment>
-                            Copyright © 2018
-                        <a
-                                href="https://www.creatanium-wallet.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {" "}
-                                Creatanium Wallet.
-                        </a>{" "}
-                            All rights reserved.
-                      </React.Fragment>
-                    ),
-                    nav: (
-                        <React.Fragment>
-                            <Grid.Col auto={true}>
-                                <List className="list-inline list-inline-dots mb-0">
-                                    <List.Item className="list-inline-item">
-                                        <a href=""></a>
-                                    </List.Item>
-                                    <List.Item className="list-inline-item">
-                                        <a href=""></a>
-                                    </List.Item>
-                                </List>
-                            </Grid.Col>
-                        </React.Fragment>
-                    ),
-                }} */
+            /* footerProps={{
+                copyright: (
+                    <React.Fragment>
+                        Copyright © 2018
+                    <a
+                            href="https://www.creatanium-wallet.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {" "}
+                            Creatanium Wallet.
+                    </a>{" "}
+                        All rights reserved.
+                  </React.Fragment>
+                ),
+                nav: (
+                    <React.Fragment>
+                        <Grid.Col auto={true}>
+                            <List className="list-inline list-inline-dots mb-0">
+                                <List.Item className="list-inline-item">
+                                    <a href=""></a>
+                                </List.Item>
+                                <List.Item className="list-inline-item">
+                                    <a href=""></a>
+                                </List.Item>
+                            </List>
+                        </Grid.Col>
+                    </React.Fragment>
+                ),
+            }} */
             >
 
                 {this.props.children}

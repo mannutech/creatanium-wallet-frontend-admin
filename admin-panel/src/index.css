@@ -1,56 +1,90 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-#root > div > div > div.page-content > div > div > div.card-header > div > input {
-  height : 0.90rem
+#root>div>div>div.page-content>div>div>div.card-header>div>input {
+  height: 0.90rem
 }
 
-#root > div > div > div.page-content > div > div > div.card-body > div.margin-bottom-24 {
+#root>div>div>div.page-content>div>div>div.card-body>div.margin-bottom-24 {
   margin-bottom: 0.2rem !important
 }
 
-
-#root > div > div > div.page-content > div > div > div.card-body {
+#root>div>div>div.page-content>div>div>div.card-body {
   padding: 0rem 0rem 0.5rem 0rem;
 }
 
-#root > div > div > div.page-content > div > div.row.row.gutters-xs > div.col.col-12.col-sm-5.col-lg-4 > div > div.card-body > div > span > div {
-  padding-top : 0.25rem;
-  margin-top : 0rem;
+#root>div>div>div.page-content>div>div.row.row.gutters-xs>div.col.col-12.col-sm-5.col-lg-4>div>div.card-body>div>span>div {
+  padding-top: 0.25rem;
+  margin-top: 0rem;
 }
 
-#root > div > div > div.page-content > div > span > div > div.card-body > div > div.col.col-12.col-sm-5.col-lg-8 > div.card > div.card-body > div {
-  margin-bottom: 0.5rem
-}
-#root > div > div > div.page-content > div > span > div > div.card-body > div > div.col.col-12.col-sm-12.col-lg-8 > div.card > div.card-body > div {
+#root>div>div>div.page-content>div>span>div>div.card-body>div>div.col.col-12.col-sm-5.col-lg-8>div.card>div.card-body>div {
   margin-bottom: 0.5rem
 }
 
-#root > div > div > div.page-content > div > div.row.row.gutters-xs > div.col.col-12.col-sm-5.col-lg-8 > div.card > div.card-body > div > div > button {
+#root>div>div>div.page-content>div>span>div>div.card-body>div>div.col.col-12.col-sm-12.col-lg-8>div.card>div.card-body>div {
+  margin-bottom: 0.5rem
+}
+
+#root>div>div>div.page-content>div>div.row.row.gutters-xs>div.col.col-12.col-sm-5.col-lg-8>div.card>div.card-body>div>div>button {
   font-size: 12px;
-  font-weight : 600;
+  font-weight: 600;
 }
 
-#root > div > div > div.page-content > div > div.card > div.card-body > ul > li:nth-child(1) {
+#root>div>div>div.page-content>div>div.card>div.card-body>ul>li:nth-child(1) {
   margin-left: 1rem;
 }
 
-#root > div > div > div.page-content > div > div:nth-child(2) > div.card-body {
+#root > div > div > div.page-content > div > div:nth-child(1) > div.card-body > ul{ 
+  background-color: #f5f6fbb0
+}
+
+#root>div>div>div.page-content>div>div:nth-child(2)>div.card-body {
   padding: 1rem;
 }
 
-#root > div > div > div.page-content > div > span > div > div.card-body > div > div.col.col-12.col-sm-12.col-lg-4 > div > div.card-body > div > span:nth-child(4) > ul > li > div > strong {
+#root>div>div>div.page-content>div>span>div>div.card-body>div>div.col.col-12.col-sm-12.col-lg-4>div>div.card-body>div>span:nth-child(4)>ul>li>div>strong {
   font-weight: 400
+}
+
+div.styles_Editext__buttons_container__1kphL>button {
+  padding: 0em
+}
+
+div.styles_Editext__editing_container__3yvUv>input {
+  padding: 0em
+}
+
+div.styles_Editext__editing_container__3yvUv>div>button.styles_Editext__button__6H8n_.styles_Editext__save_button__3WN6q.styles_Editext__hide_default_icons__AV_7m {
+  background-color: transparent
+}
+
+button.styles_Editext__button__6H8n_.styles_Editext__cancel_button__259hb.styles_Editext__hide_default_icons__AV_7m {
+  background-color: transparent
+}
+
+div.styles_Editext__buttons_container__1kphL>button {
+  background-color: transparent
+}
+
+#root>div>div>div.page-content>div>div:nth-child(2)>div.card-body {
+  padding : 0rem
+}
+
+
+#root > div > div > div.page-content > div > span > div > div.card-body > div > div.col.col-12.col-sm-12.col-lg-8 > div:nth-child(3) > div.card-body {
+  padding : 0rem
+}
+
+#root > div > div > div.page-content > div > span > div > div.card-body > div > div.col.col-12.col-sm-12.col-lg-8 > div:nth-child(4) > div.card-body{
+  padding : 0rem
 }

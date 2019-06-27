@@ -17,7 +17,7 @@ const PrivateOnlyRoute = ({ component: Component, ...rest }) => (
         if(props.location.pathname=='/'){
           return <Redirect
           to={{
-            pathname: '/buy',
+            pathname: '/user-lookup',
             state: { from: props.location}
           }}
         />
@@ -59,7 +59,7 @@ class App extends Component {
         <React.Fragment>
           <PublicOnlyRoute exact path="/login" component={Login} />
           <PublicOnlyRoute exact path="/signup" component={Signup} />
-          <PrivateOnlyRoute exact path="/" component={buy} />
+          <PrivateOnlyRoute exact path="/" component={UserLookup} />
           <PrivateOnlyRoute exact path="/user-lookup" component={UserLookup} />
           <PrivateOnlyRoute exact path="/transactions" component={Transactions} />
           <PrivateOnlyRoute exact path="/buy-cmb" component={buyCMB} />
