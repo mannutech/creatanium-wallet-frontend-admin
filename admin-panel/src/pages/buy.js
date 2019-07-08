@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import "tabler-react/dist/Tabler.css";
-import { LoginPage, Page, Alert, Form, FormCard, TabbedContainer, TabbedHeader, Button, Text, Card, Dimmer, Tab, Tabs, Table, Grid, Tag, Icon, ContactCard, Timeline } from "tabler-react";
+import { LoginPage, Page, Alert, Form, FormCard, 
+    TabbedContainer, TabbedHeader, Button, Text, Card, Dimmer, Tab, Tabs, Table, Grid, Tag, Icon, ContactCard, Timeline } from "tabler-react";
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import { API_URL } from '../constants.js'
 import moment from 'moment'
 import ReactToPrint from 'react-to-print';
 import EdiText from 'react-editext'
+import { CSVLink, CSVDownload } from "react-csv";
 import { NavLink, withRouter, Redirect, Link, LinkProps } from "react-router-dom";
 
 import SiteWrapper from './sitewrapper'
@@ -68,7 +70,7 @@ class Buy extends Component {
             },
             "transaction": {
                 "senderAddress": "",
-                "receiverAddress": "",
+                "receiverAddress": "", 
                 "trxHash": []
             },
             "exchangeRates": {
@@ -87,8 +89,8 @@ class Buy extends Component {
                 "buyQty": "",
                 "coin": "",
                 "bonusTokens": "",
-                "baseTokensUSD": "",
-                "bonusTokenUSD": "",
+                "baseTokensUSD": "", 
+                "bonusTokenUSD": "", 
                 "TotalTokensUSD": ""
             },
             "scheme": {
@@ -286,6 +288,7 @@ class Buy extends Component {
             this.state.requestDetailCardVisible != true && window.scrollTo(0, 0)
             let { data } = await axios.get(`${API_URL}/admin/add-funds/request/details?buyId=${buyId}`)
             await this.setState({ requestData: data.data.buyRequest, requestDetailCardVisible: true, loading: false })
+            console.log(data.data.buyRequest)
             await this.fetchUserNotes()
             await this.fetchInternalNotes()
         } catch (e) {
@@ -521,6 +524,7 @@ class Buy extends Component {
             await data.map((item, i) => {
                 tableItems.push({
                     key: i,
+                    date: item.on,
                     item: [
                         {
                             content: <div style={{ wordBreak: 'break-word', whiteSpace: 'pre-wrap', mozWhiteSpace: 'pre-wrap' }}>
@@ -673,7 +677,16 @@ class Buy extends Component {
                 pathname: '/',
                 state: {}
             }} />)
+            const convertToToken = (coin, amount) => {
 
+                const tokens = {
+                CMB: this.state.requestData.exchangeRates.rates.cmbusd,
+                ETC: this.state.requestData.exchangeRates.rates.btcusd,
+                BTC: this.state.requestData.exchangeRates.rates.ethusd,
+                }
+                console.log(tokens[coin], amount)
+                return Number( amount.replace("$", "").replace(" ", "") / tokens[coin]).toFixed(4)
+            }
         return (
             <SiteWrapper>
                 <Page.Content>
@@ -755,7 +768,30 @@ class Buy extends Component {
                                     </Tab>}
 
                                 <Tab title="Pending">
-                                    {this.state.pendingTable.length ? <Table
+                                    {this.state.pendingTable.length ? (<div>
+                                        <Card.Header>
+                            <Card.Title>Pending Transactions</Card.Title>
+                            <Card.Options>
+
+                                <Form.InputGroup>
+                            
+                                    <span className="input-group-btn ml-2">
+                                    <CSVLink filename="pending-transactions.csv" data={[
+                                            ["no.", "First name", "Last name", "Email", "Qty", "Coin", "Price USD", "Buy Ref.", "Date"],
+                                            ...this.state.pendingTable.map((item, index) => {let otherItem = [...item.item]; otherItem.shift(); otherItem.pop();  return [{content: index + 1}, ...otherItem].map(({content}) => content);})
+                                        ]}><Button
+                                        size="sm"
+                                        color="blue"
+                                        
+                                    >Download CSV</Button></CSVLink>
+                                    </span>
+                                </Form.InputGroup>
+
+                            </Card.Options>
+                        </Card.Header>
+                        <Card.Body>
+                                        
+                                        <Table
                                         responsive={true}
                                         className="card-table table-vcenter text-nowrap"
                                         headerItems={[
@@ -771,7 +807,9 @@ class Buy extends Component {
                                             { content: "Actions" },
                                         ]}
                                         bodyItems={this.state.pendingTable}
-                                    /> : <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                    />
+                                    </Card.Body>
+                                        </div>) : <div style={{ textAlign: 'center', padding: '2rem' }}>
                                             <img style={{ width: '20rem' }} src="images/not-found.svg" /><br />
                                             <div style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 600 }}>There are no newly created buy requests</div>
                                             <div style={{ marginTop: '0.1rem', fontSize: '0.8rem', fontWeight: 600 }}>When the customer creates the buy request it will appear here initially</div>
@@ -780,7 +818,31 @@ class Buy extends Component {
                                 </Tab>
 
                                 <Tab title="KYC Approval">
-                                    {this.state.kycApprovalTable.length ? <Table
+                                    {this.state.kycApprovalTable.length ? (<div>
+                                        <Card.Header>
+                            <Card.Title>KYC Approval Transaction</Card.Title>
+                           
+                            <Card.Options>
+
+                                <Form.InputGroup>
+                            
+                                    <span className="input-group-btn ml-2">
+                                    <CSVLink filename="kyc-approved-transactions.csv" data={[
+                                            ["no.", "First name", "Last name", "Email", "Qty", "Coin", "Price USD", "Buy Ref.", "Date"],
+                                            ...this.state.kycApprovalTable.map((item, index) => {let otherItem = [...item.item]; otherItem.shift(); otherItem.pop();  return [{content: index + 1}, ...otherItem].map(({content}) => content);})
+                                        ]}><Button
+                                        size="sm"
+                                        color="blue"
+                                        
+                                    >Download CSV</Button></CSVLink>
+                                    </span>
+                                </Form.InputGroup>
+
+                            </Card.Options>
+                        </Card.Header>
+                        <Card.Body>
+
+                                   <Table
                                         responsive
                                         className="card-table table-vcenter text-nowrap"
                                         headerItems={[
@@ -793,10 +855,10 @@ class Buy extends Component {
                                             { content: "Price USD" },
                                             { content: "Buy Ref." },
                                             { content: "Date" },
-                                            { content: "Actions" },
+                                            { content: "approvedTable   ns" },
                                         ]}
                                         bodyItems={this.state.kycApprovalTable}
-                                    /> : <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                    />  </Card.Body></div>): <div style={{ textAlign: 'center', padding: '2rem' }}>
                                             <img style={{ width: '20rem' }} src="images/not-found.svg" /><br />
                                             <div style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 600 }}>The are no requests waiting for KYC approval</div>
                                             <div style={{ marginTop: '0.1rem', fontSize: '0.8rem', fontWeight: 600 }}>All the requests that requires the KYC approval will be shown here</div>
@@ -804,7 +866,31 @@ class Buy extends Component {
                                 </Tab>
 
                                 <Tab title="OTC Approval">
-                                    {this.state.otcApprovalTable.length ? <Table
+                                    {this.state.otcApprovalTable.length ? (<div>
+                            <Card.Header>
+                            <Card.Title>OTC Approval Transaction</Card.Title>
+                           
+                            <Card.Options>
+
+                                <Form.InputGroup>
+                            
+                                    <span className="input-group-btn ml-2">
+                                    <CSVLink filename="otcApproval -transactions.csv" data={[
+                                            ["no.", "First name", "Last name", "Email", "Qty", "Coin", "Price USD", "Buy Ref.", "Date"],
+                                            ...this.state.otcApprovalTable.map((item, index) => {let otherItem = [...item.item]; otherItem.shift(); otherItem.pop();  return [{content: index + 1}, ...otherItem].map(({content}) => content);})
+                                        ]}><Button
+                                        size="sm"
+                                        color="blue"
+                                        
+                                    >Download CSV</Button></CSVLink>
+                                    </span>
+                                </Form.InputGroup>
+
+                            </Card.Options>
+                        </Card.Header>
+                        <Card.Body>
+
+                                    <Table
                                         responsive
                                         className="card-table table-vcenter text-nowrap"
                                         headerItems={[
@@ -820,14 +906,37 @@ class Buy extends Component {
                                             { content: "Actions" },
                                         ]}
                                         bodyItems={this.state.otcApprovalTable}
-                                    /> : <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                    /> </Card.Body></div>): <div style={{ textAlign: 'center', padding: '2rem' }}>
                                             <img style={{ width: '20rem' }} src="images/not-found.svg" /><br />
                                             <div style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 600 }}>The are no requests waiting for OTC approval</div>
                                             <div style={{ marginTop: '0.1rem', fontSize: '0.8rem', fontWeight: 600 }}>All the requests that requires the OTC approval will be shown here</div>
                                         </div>}</Tab>
 
                                 <Tab title="Accounts Approval">
-                                    {this.state.accountsApprovalTable.length ? <Table
+                                    {this.state.accountsApprovalTable.length ? 
+                                    (<div>
+                                         <Card.Header>
+                            <Card.Title>Accounts Transactions</Card.Title>
+                            <Card.Options>
+
+                                <Form.InputGroup>
+                            
+                                    <span className="input-group-btn ml-2">
+                                    <CSVLink filename="accountsApproval-transactions.csv" data={[
+                                            ["no.", "First name", "Last name", "Email", "Qty", "Coin", "Price USD", "Buy Ref.", "Date"],
+                                            ...this.state.accountsApprovalTable.map((item, index) => {let otherItem = [...item.item]; otherItem.shift(); otherItem.pop();  return [{content: index + 1}, ...otherItem].map(({content}) => content);})
+                                        ]}><Button
+                                        size="sm"
+                                        color="blue"
+                                        
+                                    >Download CSV</Button></CSVLink>
+                                    </span>
+                                </Form.InputGroup>
+
+                            </Card.Options>
+                        </Card.Header>
+                        <Card.Body>
+                                        <Table
                                         responsive
                                         className="card-table table-vcenter text-nowrap"
                                         headerItems={[
@@ -843,14 +952,38 @@ class Buy extends Component {
                                             { content: "Actions" },
                                         ]}
                                         bodyItems={this.state.accountsApprovalTable}
-                                    /> : <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                    /> </Card.Body> </div>): <div style={{ textAlign: 'center', padding: '2rem' }}>
                                             <img style={{ width: '20rem' }} src="images/not-found.svg" /><br />
                                             <div style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 600 }}>The are no requests waiting for Accounts approval</div>
                                             <div style={{ marginTop: '0.1rem', fontSize: '0.8rem', fontWeight: 600 }}>All the requests that requires the Accounts approval will be shown here</div>
                                         </div>}</Tab>
 
                                 <Tab title="Management Approval">
-                                    {this.state.managementApprovalTable.length ? <Table
+                                    {this.state.managementApprovalTable.length ? 
+                                    (<div>
+                                        <Card.Header>
+                            <Card.Title>Management Approval Transactions</Card.Title>
+                            <Card.Options>
+
+                                <Form.InputGroup>
+                            
+                                    <span className="input-group-btn ml-2">
+                                    <CSVLink filename="managementApproval-transactions.csv" data={[
+                                            ["no.", "First name", "Last name", "Email", "Qty", "Coin", "Price USD", "Buy Ref.", "Date"],
+                                            ...this.state.managementApprovalTable.map((item, index) => {let otherItem = [...item.item]; otherItem.shift(); otherItem.pop();  return [{content: index + 1}, ...otherItem].map(({content}) => content);})
+                                        ]}><Button
+                                        size="sm"
+                                        color="blue"
+                                        
+                                    >Download CSV</Button></CSVLink>
+                                    </span>
+                                </Form.InputGroup>
+
+                            </Card.Options>
+                        </Card.Header>
+                        <Card.Body>
+
+                       <Table
                                         responsive
                                         className="card-table table-vcenter text-nowrap"
                                         headerItems={[
@@ -866,14 +999,38 @@ class Buy extends Component {
                                             { content: "Actions" },
                                         ]}
                                         bodyItems={this.state.managementApprovalTable}
-                                    /> : <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                    />  </Card.Body>
+                                    </div>): <div style={{ textAlign: 'center', padding: '2rem' }}>
                                             <img style={{ width: '20rem' }} src="images/not-found.svg" /><br />
                                             <div style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 600 }}>The are no requests waiting for Management approval</div>
                                             <div style={{ marginTop: '0.1rem', fontSize: '0.8rem', fontWeight: 600 }}>All the requests that requires the Management approval will be shown here</div>
                                         </div>}</Tab>
 
                                 <Tab title="Approved">
-                                    {this.state.readyProcessTable.length ? <Table
+                                    {this.state.readyProcessTable.length ? 
+                                    (<div>
+                                        <Card.Header>
+                            <Card.Title>Approved Transactions</Card.Title>
+                            <Card.Options>
+
+                                <Form.InputGroup>
+                            
+                                    <span className="input-group-btn ml-2">
+                                    <CSVLink filename="approved-transactions.csv" data={[
+                                            ["no.", "First name", "Last name", "Email", "Qty", "Coin", "Price USD", "Buy Ref.", "Date"],
+                                            ...this.state.readyProcessTable.map((item, index) => {let otherItem = [...item.item]; otherItem.shift(); otherItem.pop();  return [{content: index + 1}, ...otherItem].map(({content}) => content);})
+                                        ]}><Button
+                                        size="sm"
+                                        color="blue"
+                                        
+                                    >Download CSV</Button></CSVLink>
+                                    </span>
+                                </Form.InputGroup>
+
+                            </Card.Options>
+                        </Card.Header>
+                        <Card.Body>
+                        <Table
                                         responsive
                                         className="card-table table-vcenter text-nowrap"
                                         headerItems={[
@@ -889,14 +1046,40 @@ class Buy extends Component {
                                             { content: "Actions" },
                                         ]}
                                         bodyItems={this.state.readyProcessTable}
-                                    /> : <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                    />
+                        </Card.Body>
+
+                                        </div>): <div style={{ textAlign: 'center', padding: '2rem' }}>
                                             <img style={{ width: '20rem' }} src="images/not-found.svg" /><br />
                                             <div style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 600 }}>The are no requests ready for processing</div>
                                             <div style={{ marginTop: '0.1rem', fontSize: '0.8rem', fontWeight: 600 }}>All the requests that can be processed will be shown here</div>
                                         </div>}</Tab>
 
                                 <Tab title="Processed">
-                                    {this.state.processedTable.length ? <Table
+                                    {this.state.processedTable.length ? (<div>
+                                        <Card.Header>
+                            <Card.Title>Processed Transactions</Card.Title>
+                            <Card.Options>
+
+                                <Form.InputGroup>
+                            
+                                    <span className="input-group-btn ml-2">
+                                    <CSVLink filename="processed-transactions.csv" data={[
+                                            ["no.", "First name", "Last name", "Email", "Qty", "Coin", "Price USD", "Buy Ref.", "Date"],
+                                            ...this.state.processedTable.map((item, index) => {let otherItem = [...item.item]; otherItem.shift(); otherItem.pop();  return [{content: index + 1}, ...otherItem].map(({content}) => content);})
+                                        ]}><Button
+                                        size="sm"
+                                        color="blue"
+                                        
+                                    >Download CSV</Button></CSVLink>
+                                    </span>
+                                </Form.InputGroup>
+
+                            </Card.Options>
+                        </Card.Header>
+                        <Card.Body>
+                                        
+                                        <Table
                                         responsive
                                         className="card-table table-vcenter text-nowrap"
                                         headerItems={[
@@ -912,14 +1095,39 @@ class Buy extends Component {
                                             { content: "Actions" },
                                         ]}
                                         bodyItems={this.state.processedTable}
-                                    /> : <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                    />
+                                    
+                                    </Card.Body></div>) : <div style={{ textAlign: 'center', padding: '2rem' }}>
                                             <img style={{ width: '20rem' }} src="images/not-found.svg" /><br />
                                             <div style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 600 }}>The are no requests that has been processed</div>
                                             <div style={{ marginTop: '0.1rem', fontSize: '0.8rem', fontWeight: 600 }}>All the processed request will be shown here</div>
                                         </div>}</Tab>
 
                                 <Tab title="Cancelled">
-                                    {this.state.cancelledTable.length ? <Table
+                                    {this.state.cancelledTable.length ? (
+                                    <div>
+                                         <Card.Header>
+                            <Card.Title>Cancelled Transactions</Card.Title>
+                            <Card.Options>
+
+                                <Form.InputGroup>
+                            
+                                    <span className="input-group-btn ml-2">
+                                    <CSVLink filename="cancelled-transactions.csv" data={[
+                                            ["no.", "First name", "Last name", "Email", "Qty", "Coin", "Price USD", "Buy Ref.", "Date"],
+                                            ...this.state.cancelledTable.map((item, index) => {let otherItem = [...item.item]; otherItem.shift(); otherItem.pop();  return [{content: index + 1}, ...otherItem].map(({content}) => content);})
+                                        ]}><Button
+                                        size="sm"
+                                        color="blue"
+                                        
+                                    >Download CSV</Button></CSVLink>
+                                    </span>
+                                </Form.InputGroup>
+
+                            </Card.Options>
+                        </Card.Header>
+                        <Card.Body>
+                                    <Table
                                         responsive
                                         className="card-table table-vcenter text-nowrap"
                                         headerItems={[
@@ -935,7 +1143,9 @@ class Buy extends Component {
                                             { content: "Actions" },
                                         ]}
                                         bodyItems={this.state.cancelledTable}
-                                    /> : <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                    />
+                                    </Card.Body>
+                                    </div>) : <div style={{ textAlign: 'center', padding: '2rem' }}>
                                             <img style={{ width: '20rem' }} src="images/not-found.svg" /><br />
                                             <div style={{ marginTop: '1rem', fontSize: '1rem', fontWeight: 600 }}>The are no cancelled requests</div>
                                             <div style={{ marginTop: '0.1rem', fontSize: '0.8rem', fontWeight: 600 }}>All the cancelled requests will be shown here</div>
@@ -1077,7 +1287,9 @@ class Buy extends Component {
                                                                     onSave={(val) => { this.handleKycEdit('mobile', val) }}
                                                                 />
                                                             },
+           
                                                             {
+                                                              
                                                                 title: "Home Address", content: <EdiText
                                                                     type="textarea"
                                                                     value={this.state.requestData.contextData.aggrement.basic.address}
@@ -1175,10 +1387,10 @@ class Buy extends Component {
                                                         { title: "Timestamp", content: moment(this.state.requestData.exchangeRates.timestamp).format("h:mm:ss A DD-MMMM-YYYY ") },
                                                         { title: "CMB/USD", content: <span>{Number(this.state.requestData.exchangeRates.rates.cmbusd).toFixed(4)}</span> },
                                                         { title: "CMB/SGD", content: <span>{Number(this.state.requestData.exchangeRates.rates.cmbsgd).toFixed(4)}</span> },
-                                                        { title: "SGD/USD", content: <span>{Number(this.state.requestData.exchangeRates.rates.sgdusd).toFixed(4)}</span> },
-                                                        { title: "USD/SGD", content: <span>{Number(this.state.requestData.exchangeRates.rates.usdsgd).toFixed(4)}</span> },
-                                                        { title: "ETH/USD", content: <span>{Number(this.state.requestData.exchangeRates.rates.ethusd).toFixed(4)}</span> },
-                                                        { title: "BTC/USD", content: <span>{Number(this.state.requestData.exchangeRates.rates.btcusd).toFixed(4)}</span> },
+                                                        { title: "USD/SGD", content: <span>{Number(this.state.requestData.exchangeRates.rates.sgdusd).toFixed(4)}</span> },
+                                                        { title: "SGD/USD", content: <span>{Number(this.state.requestData.exchangeRates.rates.usdsgd).toFixed(4)}</span> },
+                                                        { title: "BTC/USD", content: <span>{Number(this.state.requestData.exchangeRates.rates.ethusd).toFixed(4)}</span> },
+                                                        { title: "ETH/USD", content: <span>{Number(this.state.requestData.exchangeRates.rates.btcusd).toFixed(4)}</span> },
                                                         ]}
                                                     />
 
@@ -1204,6 +1416,18 @@ class Buy extends Component {
                                                             {
                                                                 title: "Total Tokens (US $)",
                                                                 content: this.state.requestData.investment.TotalTokensUSD,
+                                                            },
+                                                            {
+                                                                title: "Base Tokens",
+                                                                content: convertToToken(this.state.requestData.investment.coin, this.state.requestData.investment.baseTokensUSD),
+                                                            },
+                                                            {
+                                                                title: "Bonus Token",
+                                                                content: convertToToken(this.state.requestData.investment.coin, this.state.requestData.investment.bonusTokenUSD),
+                                                            },
+                                                            {
+                                                                title: "Total Tokens",
+                                                                content: convertToToken(this.state.requestData.investment.coin, this.state.requestData.investment.TotalTokensUSD),
                                                             },
                                                         ]}
                                                     />
@@ -1235,7 +1459,7 @@ class Buy extends Component {
                                             </Card>
                                         </Dimmer>
 
-                                        <Card title="Internal Notes" isCollapsible isCollapsed={true}>
+                                        <Card title="Internal Notes" isCollapsible isCollapsed={false}>
                                             <Card.Body>
                                                 {this.state.internalNotes.length > 0 ? <Table
                                                     responsive={true}
@@ -1258,7 +1482,7 @@ class Buy extends Component {
                                         </Card>
 
 
-                                        <Card title="User Notes" isCollapsible isCollapsed={true}>
+                                        <Card title="User Notes" isCollapsible isCollapsed={false}>
                                             <Card.Body>
                                                 {this.state.userNotes.length > 0 ? <Table
                                                     responsive={true}
